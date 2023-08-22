@@ -10,7 +10,10 @@ wss.on('connection', (ws: WebSocket) => {
     console.log('Client connected');
 
     ws.on('message', (message: string) => {
-        // Here we'll handle incoming messages, like appointment updates.
+        console.log('Received message:', message);
+        
+        // For now, just echo the received message back to the client
+        ws.send(message);
     });
 });
 

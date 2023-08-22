@@ -1,40 +1,30 @@
 import React, { useState } from 'react';
 import { Button, TextField } from '@mui/material';
 import AppointmentList from '../components/appointment-list/AppointmentList';
-import { useWebSocket } from '../contexts/WebSocketContext';
-
-interface Appointment {
-  id: string;
-  date: Date;
-  doctor: string;
-  patient: string;
-}
+import { Appointment, useWebSocket } from '../contexts/WebSocketContext';
 
 const AppointmentsPage: React.FC = () => {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const { sendMessage } = useWebSocket();
 
-  // Placeholder state for creating a new appointment
   const [newAppointment, setNewAppointment] = useState({
     doctor: '',
     patient: ''
   });
 
   const handleAddAppointment = () => {
-    const appointmentId = Math.random().toString(36).substring(7);  // Simple ID generation, consider a more robust method for production
-    const newAppt = {
+    const appointmentId = Math.random().toString(36).substring(7); // Simple ID generation
+    const newAppt: Appointment = {
       id: appointmentId,
-      date: new Date(),
+      date: new Date().toString(),
       doctor: newAppointment.doctor,
       patient: newAppointment.patient
     };
 
-    setAppointments(prev => [...prev, newAppt]);
     sendMessage({
       type: 'NEW_APPOINTMENT',
-      payload: { appointmentId }
+      payload: newAppt,
     });
-  }
+  };
 
   return (
     <section style={{ padding: 20 }}>
@@ -50,9 +40,11 @@ const AppointmentsPage: React.FC = () => {
           value={newAppointment.patient}
           onChange={(e) => setNewAppointment(prev => ({ ...prev, patient: e.target.value }))}
         />
-        <Button onClick={handleAddAppointment}>Add Appointment</Button>
+        <Button variant="contained" color="primary" onClick={handleAddAppointment}>
+          Add Appointment
+        </Button>
       </div>
-      <AppointmentList appointments={appointments} />
+      <AppointmentList />
     </section>
   );
 }

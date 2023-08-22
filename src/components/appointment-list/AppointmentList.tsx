@@ -2,19 +2,8 @@ import React from 'react';
 import { Button, Card, CardContent, Typography } from '@mui/material';
 import { useWebSocket } from '../../contexts/WebSocketContext';
 
-interface Appointment {
-  id: string;
-  date: Date;
-  doctor: string;
-  patient: string;
-}
-
-interface AppointmentListProps {
-  appointments: Appointment[];
-}
-
-const AppointmentList: React.FC<AppointmentListProps> = ({ appointments }) => {
-  const { sendMessage } = useWebSocket();
+const AppointmentList: React.FC = () => {
+  const { state, sendMessage } = useWebSocket();
 
   const handleConfirm = (appointmentId: string) => {
     sendMessage({
@@ -23,7 +12,7 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ appointments }) => {
     });
   }
 
-  const handleReschedule = (appointmentId: string, newDate: Date) => {
+  const handleReschedule = (appointmentId: string, newDate: string) => {
     sendMessage({
       type: 'RESCHEDULE_APPOINTMENT',
       payload: { appointmentId, newDate }
@@ -37,6 +26,8 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ appointments }) => {
     });
   }
 
+  const appointments = state.appointments;
+
   return (
     <div style={{ padding: 20 }}>
       {appointments.map(appointment => (
@@ -49,11 +40,12 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ appointments }) => {
               Patient: {appointment.patient}
             </Typography>
             <Typography variant="body2">
-              Date: {appointment.date.toString()}
+              Date: {appointment.date} 
+              {/* Using Intl for better date formatting */}
             </Typography>
             <Button onClick={() => handleConfirm(appointment.id)}>Confirm</Button>
             <Button onClick={() => handleCancel(appointment.id)}>Cancel</Button>
-            <Button onClick={() => handleReschedule(appointment.id, new Date())}>Reschedule</Button>
+            <Button onClick={() => handleReschedule(appointment.id, new Date().toString())}>Reschedule</Button>
           </CardContent>
         </Card>
       ))}
