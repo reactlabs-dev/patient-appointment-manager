@@ -34,12 +34,12 @@ const AppointmentsPage: React.FC = () => {
           label="Doctor's Name"
           value={newAppointment.doctor}
           onChange={(e) => setNewAppointment(prev => ({ ...prev, doctor: e.target.value }))}
-        />
+        />&nbsp;
         <TextField 
           label="Patient's Name"
           value={newAppointment.patient}
           onChange={(e) => setNewAppointment(prev => ({ ...prev, patient: e.target.value }))}
-        />
+        />&nbsp;
         <Button variant="contained" color="primary" onClick={handleAddAppointment}>
           Add Appointment
         </Button>
