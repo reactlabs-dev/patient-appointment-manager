@@ -14,7 +14,7 @@ wss.on('connection', (ws: WebSocket) => {
     });
 });
 
-const PORT = 5000;
+const PORT = 8080;
 server.listen(PORT, () => {
     console.log(`Server started on http://localhost:${PORT}`);
 });
