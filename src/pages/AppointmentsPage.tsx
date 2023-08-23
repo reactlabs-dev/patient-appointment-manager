@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { Button, TextField } from '@mui/material';
 import AppointmentList from '../components/appointment-list/AppointmentList';
-import { Appointment, useWebSocket } from '../contexts/WebSocketContext';
+import { Appointment, AppointmentStatus, useWebSocket } from '../contexts/WebSocketContext';
 
 const AppointmentsPage: React.FC = () => {
   const { sendMessage } = useWebSocket();
 
   const [newAppointment, setNewAppointment] = useState({
     doctor: '',
-    patient: ''
+    patient: '',
+    status: 'pending',
   });
 
   const handleAddAppointment = () => {
     const appointmentId = Math.random().toString(36).substring(7); // Simple ID generation
     const newAppt: Appointment = {
       id: appointmentId,
+      status: newAppointment.status as AppointmentStatus,
       date: new Date().toString(),
       doctor: newAppointment.doctor,
       patient: newAppointment.patient

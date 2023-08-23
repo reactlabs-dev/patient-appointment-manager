@@ -3,8 +3,11 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const WEBSOCKET_ENDPOINT = 'ws://localhost:8080';
 
+export type AppointmentStatus = 'confirmed' | 'rescheduled' | 'cancelled' | 'pending';
+
 export interface Appointment {
     id: string;
+    status: AppointmentStatus;
     date: string;
     doctor: string;
     patient: string;
@@ -32,6 +35,7 @@ type WebSocketMessage = {
       appointmentId?: string;
       newDate?: string;
       id?: string;
+      status?: AppointmentStatus;
       date?: string;
       doctor?: string;
       patient?: string;
@@ -49,29 +53,89 @@ interface WebSocketProviderProps {
     children: React.ReactNode;
   }
 
+  // const reducer = (state: WebSocketState, action: WebSocketMessage): WebSocketState => {
+  //   console.log('Current State:', state);
+  //   console.log('Action', action);
+  //   switch (action.type) {
+  //     case 'NEW_APPOINTMENT':
+  //       const newAppt: Appointment = {
+  //           id: action.payload.id!,
+  //           status: action.payload.status!,
+  //           date: action.payload.date!,
+  //           doctor: action.payload.doctor!,
+  //           patient: action.payload.patient!,
+  //       };
+  //       return { ...state, totalAppointments: state.totalAppointments + 1,
+  //       appointments: [...state.appointments, newAppt ]};
+  //     case 'CONFIRM_APPOINTMENT':
+  //       return { ...state, confirmed: state.confirmed + 1 };
+  //     case 'CANCEL_APPOINTMENT':
+  //       return { ...state, cancelled: state.cancelled + 1 };
+  //     case 'RESCHEDULE_APPOINTMENT':
+  //       return { ...state, rescheduled: state.rescheduled + 1 };
+  //     default:
+  //       return state;
+  //   }
+  // };
+
   const reducer = (state: WebSocketState, action: WebSocketMessage): WebSocketState => {
     console.log('Current State:', state);
     console.log('Action', action);
     switch (action.type) {
       case 'NEW_APPOINTMENT':
         const newAppt: Appointment = {
-            id: action.payload.id!,
-            date: action.payload.date!,
-            doctor: action.payload.doctor!,
-            patient: action.payload.patient!
+          id: action.payload.id!,
+          status: action.payload.status!,
+          date: action.payload.date!,
+          doctor: action.payload.doctor!,
+          patient: action.payload.patient!,
         };
-        return { ...state, totalAppointments: state.totalAppointments + 1,
-        appointments: [...state.appointments, newAppt ]};
+        return { 
+          ...state, 
+          totalAppointments: state.totalAppointments + 1,
+          appointments: [...state.appointments, newAppt]
+        };
       case 'CONFIRM_APPOINTMENT':
-        return { ...state, confirmed: state.confirmed + 1 };
+        const confirmAppointments = state.appointments.map(appointment => {
+          if (appointment.id === action.payload.appointmentId) {
+            return { ...appointment, status: 'confirmed' };
+          }
+          return appointment;
+        });
+        return {
+          ...state,
+          confirmed: state.confirmed + 1,
+          appointments: confirmAppointments as Appointment[],
+        };
       case 'CANCEL_APPOINTMENT':
-        return { ...state, cancelled: state.cancelled + 1 };
+        const updatedAppointments = state.appointments.map(appointment => {
+          if (appointment.id === action.payload.appointmentId) {
+            return { ...appointment, status: 'cancelled' };
+          }
+          return appointment;
+        });
+        return { 
+          ...state, 
+          cancelled: state.cancelled + 1,
+          appointments: updatedAppointments as Appointment[],
+        };
       case 'RESCHEDULE_APPOINTMENT':
-        return { ...state, rescheduled: state.rescheduled + 1 };
+        const rescheduledAppointments = state.appointments.map(appointment => {
+          if (appointment.id === action.payload.appointmentId) {
+            return { ...appointment, status: 'rescheduled' };
+          }
+          return appointment;
+        });
+        return {
+          ...state,
+          rescheduled: state.rescheduled + 1,
+          appointments: rescheduledAppointments as Appointment[],
+        };
       default:
         return state;
     }
   };
+  
 
   export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
     const ws = useRef<ReconnectingWebSocket | null>(null);

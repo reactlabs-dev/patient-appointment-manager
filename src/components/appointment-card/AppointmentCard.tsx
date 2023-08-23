@@ -7,6 +7,7 @@ interface AppointmentCardProps {
 }
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment }) => {
+
   return (
     <Card sx={{ margin: '20px 0' }}>
       <CardContent>
