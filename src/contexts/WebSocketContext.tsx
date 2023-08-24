@@ -144,6 +144,24 @@ interface WebSocketProviderProps {
     // Connect to the WebSocket (You can adjust the URL to your WebSocket server)
     if (!ws.current) {
       ws.current = new ReconnectingWebSocket(WEBSOCKET_ENDPOINT);
+
+      // logging for connection events
+      ws.current.addEventListener('open', () => {
+        console.log('Websocket connected.');
+      });
+
+      ws.current.addEventListener('error', (event) => {
+        console.log('Websocket error:', event);
+      });
+
+      ws.current.addEventListener('close', (event) => {
+        console.log(`Websocket closed with code ${event.code}. Reason: ${event.reason}`);
+      });
+
+      ws.current.addEventListener('message', (event) => {
+        console.log('Received message', event.data);
+      });
+
       ws.current.onopen = () => console.log('WebSocket connected');
       ws.current.onmessage = (message) => {
           console.log('Received WebSocket message:', message.data);
